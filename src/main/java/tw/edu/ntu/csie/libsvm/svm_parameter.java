@@ -47,6 +47,7 @@ public class svm_parameter implements Cloneable,java.io.Serializable
 		}
 	}
 
+        @Override
         public String toString() {
             Class<?> myClass = this.getClass();
             Field[] fields = myClass.getDeclaredFields();
@@ -56,7 +57,7 @@ public class svm_parameter implements Cloneable,java.io.Serializable
                 stb.append(" : ");
                 try {
                     stb.append(field.get(this));
-                } catch (Exception ex) {} //ignore
+                } catch (IllegalAccessException | IllegalArgumentException ex) {} //ignore
                 stb.append("\n");
             }
             return stb.toString();
