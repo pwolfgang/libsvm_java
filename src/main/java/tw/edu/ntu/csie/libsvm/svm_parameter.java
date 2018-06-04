@@ -1,4 +1,7 @@
 package tw.edu.ntu.csie.libsvm;
+
+import java.lang.reflect.Field;
+
 public class svm_parameter implements Cloneable,java.io.Serializable
 {
 	/* svm_type */
@@ -44,4 +47,18 @@ public class svm_parameter implements Cloneable,java.io.Serializable
 		}
 	}
 
+        public String toString() {
+            Class<?> myClass = this.getClass();
+            Field[] fields = myClass.getDeclaredFields();
+            StringBuilder stb = new StringBuilder();
+            for (Field field : fields) {
+                stb.append(field.getName());
+                stb.append(" : ");
+                try {
+                    stb.append(field.get(this));
+                } catch (Exception ex) {} //ignore
+                stb.append("\n");
+            }
+            return stb.toString();
+        }
 }
