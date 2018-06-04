@@ -31,7 +31,7 @@ class Cache {
 		int len;		// data[0,len) is cached in this entry
 	}
 	private final head_t[] head;
-	private head_t lru_head;
+	private final head_t lru_head;
 
 	Cache(int l_, long size_)
 	{
@@ -142,7 +142,7 @@ abstract class QMatrix {
 };
 
 abstract class Kernel extends QMatrix {
-	private svm_node[][] x;
+	private final svm_node[][] x;
 	private final double[] x_square;
 
 	// svm_parameter
@@ -151,9 +151,12 @@ abstract class Kernel extends QMatrix {
 	private final double gamma;
 	private final double coef0;
 
+        @Override
 	abstract float[] get_Q(int column, int len);
+        @Override
 	abstract double[] get_QD();
 
+        @Override
 	void swap_index(int i, int j)
 	{
 		{svm_node[] tmp=x[i]; x[i]=x[j]; x[j]=tmp;}
@@ -198,7 +201,7 @@ abstract class Kernel extends QMatrix {
 		this.gamma = param.gamma;
 		this.coef0 = param.coef0;
 
-		x = (svm_node[][])x_.clone();
+		x = x_.clone();
 
 		if(kernel_type == svm_parameter.RBF)
 		{
@@ -415,9 +418,9 @@ class Solver {
 		this.l = l;
 		this.Q = Q;
 		QD = Q.get_QD();
-		p = (double[])p_.clone();
-		y = (byte[])y_.clone();
-		alpha = (double[])alpha_.clone();
+		p = p_.clone();
+		y = y_.clone();
+		alpha = alpha_.clone();
 		this.Cp = Cp;
 		this.Cn = Cn;
 		this.eps = eps;
@@ -906,6 +909,7 @@ final class Solver_NU extends Solver
 {
 	private SolutionInfo si;
 
+        @Override
 	void Solve(int l, QMatrix Q, double[] p, byte[] y,
 		   double[] alpha, double Cp, double Cn, double eps,
 		   SolutionInfo si, int shrinking)
@@ -915,6 +919,7 @@ final class Solver_NU extends Solver
 	}
 
 	// return 1 if already optimal, return 0 otherwise
+        @Override
 	int select_working_set(int[] working_set)
 	{
 		// return i,j such that y_i = y_j and
@@ -1047,6 +1052,7 @@ final class Solver_NU extends Solver
 			return(false);
 	}
 
+        @Override
 	void do_shrinking()
 	{
 		double Gmax1 = -INF;	// max { -y_i * grad(f)_i | y_i = +1, i in I_up(\alpha) }
@@ -1099,6 +1105,7 @@ final class Solver_NU extends Solver
 			}
 	}
 	
+        @Override
 	double calculate_rho()
 	{
 		int nr_free1 = 0,nr_free2 = 0;
@@ -1162,13 +1169,14 @@ class SVC_Q extends Kernel
 	SVC_Q(svm_problem prob, svm_parameter param, byte[] y_)
 	{
 		super(prob.l, prob.x, param);
-		y = (byte[])y_.clone();
+		y = y_.clone();
 		cache = new Cache(prob.l,(long)(param.cache_size*(1<<20)));
 		QD = new double[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i] = kernel_function(i,i);
 	}
 
+        @Override
 	float[] get_Q(int i, int len)
 	{
 		float[][] data = new float[1][];
@@ -1181,11 +1189,13 @@ class SVC_Q extends Kernel
 		return data[0];
 	}
 
+        @Override
 	double[] get_QD()
 	{
 		return QD;
 	}
 
+        @Override
 	void swap_index(int i, int j)
 	{
 		cache.swap_index(i,j);
@@ -1209,6 +1219,7 @@ class ONE_CLASS_Q extends Kernel
 			QD[i] = kernel_function(i,i);
 	}
 
+        @Override
 	float[] get_Q(int i, int len)
 	{
 		float[][] data = new float[1][];
@@ -1221,11 +1232,13 @@ class ONE_CLASS_Q extends Kernel
 		return data[0];
 	}
 
+        @Override
 	double[] get_QD()
 	{
 		return QD;
 	}
 
+        @Override
 	void swap_index(int i, int j)
 	{
 		cache.swap_index(i,j);
@@ -1241,7 +1254,7 @@ class SVR_Q extends Kernel
 	private final byte[] sign;
 	private final int[] index;
 	private int next_buffer;
-	private float[][] buffer;
+	private final float[][] buffer;
 	private final double[] QD;
 
 	SVR_Q(svm_problem prob, svm_parameter param)
@@ -1265,6 +1278,7 @@ class SVR_Q extends Kernel
 		next_buffer = 0;
 	}
 
+        @Override
 	void swap_index(int i, int j)
 	{
 		{byte tmp=sign[i]; sign[i]=sign[j]; sign[j]=tmp;}
@@ -1272,6 +1286,7 @@ class SVR_Q extends Kernel
 		{double tmp=QD[i]; QD[i]=QD[j]; QD[j]=tmp;}
 	}
 
+        @Override
 	float[] get_Q(int i, int len)
 	{
 		float[][] data = new float[1][];
@@ -1291,6 +1306,7 @@ class SVR_Q extends Kernel
 		return buf;
 	}
 
+        @Override
 	double[] get_QD()
 	{
 		return QD;
@@ -1304,8 +1320,9 @@ public class svm {
 	public static final int LIBSVM_VERSION=322; 
 	public static final Random rand = new Random();
 
-	private static svm_print_interface svm_print_stdout = new svm_print_interface()
+	private static final svm_print_interface svm_print_stdout = new svm_print_interface()
 	{
+                @Override
 		public void print(String s)
 		{
 			System.out.print(s);
@@ -2551,7 +2568,7 @@ public class svm {
 
 	private static double atof(String s)
 	{
-		return Double.valueOf(s).doubleValue();
+		return Double.valueOf(s);
 	}
 
 	private static int atoi(String s)
@@ -2580,7 +2597,7 @@ public class svm {
 					int i;
 					for(i=0;i<svm_type_table.length;i++)
 					{
-						if(arg.indexOf(svm_type_table[i])!=-1)
+						if(arg.contains(svm_type_table[i]))
 						{
 							param.svm_type=i;
 							break;
@@ -2597,7 +2614,7 @@ public class svm {
 					int i;
 					for(i=0;i<kernel_type_table.length;i++)
 					{
-						if(arg.indexOf(kernel_type_table[i])!=-1)
+						if(arg.contains(kernel_type_table[i]))
 						{
 							param.kernel_type=i;
 							break;
@@ -2736,8 +2753,9 @@ public class svm {
 		   svm_type != svm_parameter.NU_SVC &&
 		   svm_type != svm_parameter.ONE_CLASS &&
 		   svm_type != svm_parameter.EPSILON_SVR &&
-		   svm_type != svm_parameter.NU_SVR)
-		return "unknown svm type";
+		   svm_type != svm_parameter.NU_SVR) {
+                    return "unknown svm type";
+                }
 
 		// kernel_type, degree
 	
@@ -2746,8 +2764,9 @@ public class svm {
 		   kernel_type != svm_parameter.POLY &&
 		   kernel_type != svm_parameter.RBF &&
 		   kernel_type != svm_parameter.SIGMOID &&
-		   kernel_type != svm_parameter.PRECOMPUTED)
+		   kernel_type != svm_parameter.PRECOMPUTED) {
 			return "unknown kernel type";
+                }
 
 		if(param.gamma < 0)
 			return "gamma < 0";
