@@ -4,10 +4,18 @@
 
 
 package tw.edu.ntu.csie.libsvm;
-import java.io.*;
-import java.util.*;
 
 //
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
+import java.util.StringTokenizer;
+
 // Kernel Cache
 //
 // l is the number of total data items
@@ -81,7 +89,7 @@ class Cache {
 			if(h.data != null) System.arraycopy(h.data,0,new_data,0,h.len);
 			h.data = new_data;
 			size -= more;
-			do {int tmp=h.len; h.len=len; len=tmp;} while(false);
+			{int tmp=h.len; h.len=len; len=tmp;}
 		}
 
 		lru_insert(h);
@@ -95,18 +103,18 @@ class Cache {
 		
 		if(head[i].len > 0) lru_delete(head[i]);
 		if(head[j].len > 0) lru_delete(head[j]);
-		do {float[] tmp=head[i].data; head[i].data=head[j].data; head[j].data=tmp;} while(false);
-		do {int tmp=head[i].len; head[i].len=head[j].len; head[j].len=tmp;} while(false);
+		{float[] tmp=head[i].data; head[i].data=head[j].data; head[j].data=tmp;}
+		{int tmp=head[i].len; head[i].len=head[j].len; head[j].len=tmp;}
 		if(head[i].len > 0) lru_insert(head[i]);
 		if(head[j].len > 0) lru_insert(head[j]);
 
-		if(i>j) do {int tmp=i; i=j; j=tmp;} while(false);
+		if(i>j) {int tmp=i; i=j; j=tmp;}
 		for(head_t h = lru_head.next; h!=lru_head; h=h.next)
 		{
 			if(h.len > i)
 			{
 				if(h.len > j)
-					do {float tmp=h.data[i]; h.data[i]=h.data[j]; h.data[j]=tmp;} while(false);
+					{float tmp=h.data[i]; h.data[i]=h.data[j]; h.data[j]=tmp;}
 				else
 				{
 					// give up
@@ -148,8 +156,8 @@ abstract class Kernel extends QMatrix {
 
 	void swap_index(int i, int j)
 	{
-		do {svm_node[] tmp=x[i]; x[i]=x[j]; x[j]=tmp;} while(false);
-		if(x_square != null) do {double tmp=x_square[i]; x_square[i]=x_square[j]; x_square[j]=tmp;} while(false);
+		{svm_node[] tmp=x[i]; x[i]=x[j]; x[j]=tmp;}
+		if(x_square != null) {double tmp=x_square[i]; x_square[i]=x_square[j]; x_square[j]=tmp;}
 	}
 
 	private static double powi(double base, int times)
@@ -350,13 +358,13 @@ class Solver {
 	void swap_index(int i, int j)
 	{
 		Q.swap_index(i,j);
-		do {byte tmp=y[i]; y[i]=y[j]; y[j]=tmp;} while(false);
-		do {double tmp=G[i]; G[i]=G[j]; G[j]=tmp;} while(false);
-		do {byte tmp=alpha_status[i]; alpha_status[i]=alpha_status[j]; alpha_status[j]=tmp;} while(false);
-		do {double tmp=alpha[i]; alpha[i]=alpha[j]; alpha[j]=tmp;} while(false);
-		do {double tmp=p[i]; p[i]=p[j]; p[j]=tmp;} while(false);
-		do {int tmp=active_set[i]; active_set[i]=active_set[j]; active_set[j]=tmp;} while(false);
-		do {double tmp=G_bar[i]; G_bar[i]=G_bar[j]; G_bar[j]=tmp;} while(false);
+		{byte tmp=y[i]; y[i]=y[j]; y[j]=tmp;}
+		{double tmp=G[i]; G[i]=G[j]; G[j]=tmp;}
+		{byte tmp=alpha_status[i]; alpha_status[i]=alpha_status[j]; alpha_status[j]=tmp;}
+		{double tmp=alpha[i]; alpha[i]=alpha[j]; alpha[j]=tmp;}
+		{double tmp=p[i]; p[i]=p[j]; p[j]=tmp;}
+		{int tmp=active_set[i]; active_set[i]=active_set[j]; active_set[j]=tmp;}
+		{double tmp=G_bar[i]; G_bar[i]=G_bar[j]; G_bar[j]=tmp;}
 	}
 
 	void reconstruct_gradient()
@@ -1182,8 +1190,8 @@ class SVC_Q extends Kernel
 	{
 		cache.swap_index(i,j);
 		super.swap_index(i,j);
-		do {byte tmp=y[i]; y[i]=y[j]; y[j]=tmp;} while(false);
-		do {double tmp=QD[i]; QD[i]=QD[j]; QD[j]=tmp;} while(false);
+                {byte tmp=y[i]; y[i]=y[j]; y[j]=tmp;}
+		{double tmp=QD[i]; QD[i]=QD[j]; QD[j]=tmp;}
 	}
 }
 
@@ -1222,7 +1230,7 @@ class ONE_CLASS_Q extends Kernel
 	{
 		cache.swap_index(i,j);
 		super.swap_index(i,j);
-		do {double tmp=QD[i]; QD[i]=QD[j]; QD[j]=tmp;} while(false);
+		{double tmp=QD[i]; QD[i]=QD[j]; QD[j]=tmp;}
 	}
 }
 
@@ -1259,9 +1267,9 @@ class SVR_Q extends Kernel
 
 	void swap_index(int i, int j)
 	{
-		do {byte tmp=sign[i]; sign[i]=sign[j]; sign[j]=tmp;} while(false);
-		do {int tmp=index[i]; index[i]=index[j]; index[j]=tmp;} while(false);
-		do {double tmp=QD[i]; QD[i]=QD[j]; QD[j]=tmp;} while(false);
+		{byte tmp=sign[i]; sign[i]=sign[j]; sign[j]=tmp;}
+		{int tmp=index[i]; index[i]=index[j]; index[j]=tmp;}
+		{double tmp=QD[i]; QD[i]=QD[j]; QD[j]=tmp;}
 	}
 
 	float[] get_Q(int i, int len)
@@ -1751,7 +1759,7 @@ public class svm {
 		for(i=0;i<prob.l;i++)
 		{
 			int j = i+rand.nextInt(prob.l-i);
-			do {int tmp=perm[i]; perm[i]=perm[j]; perm[j]=tmp;} while(false);
+			{int tmp=perm[i]; perm[i]=perm[j]; perm[j]=tmp;}
 		}
 		for(i=0;i<nr_fold;i++)
 		{
@@ -1899,8 +1907,8 @@ public class svm {
 		//
 		if (nr_class == 2 && label[0] == -1 && label[1] == +1)
 		{
-			do {int tmp=label[0]; label[0]=label[1]; label[1]=tmp;} while(false);
-			do {int tmp=count[0]; count[0]=count[1]; count[1]=tmp;} while(false);
+			{int tmp=label[0]; label[0]=label[1]; label[1]=tmp;}
+			{int tmp=count[0]; count[0]=count[1]; count[1]=tmp;}
 			for(i=0;i<l;i++)
 			{
 				if(data_label[i] == 0)
@@ -2202,7 +2210,7 @@ public class svm {
 				for(i=0;i<count[c];i++)
 				{
 					int j = i+rand.nextInt(count[c]-i);
-					do {int tmp=index[start[c]+j]; index[start[c]+j]=index[start[c]+i]; index[start[c]+i]=tmp;} while(false);
+					{int tmp=index[start[c]+j]; index[start[c]+j]=index[start[c]+i]; index[start[c]+i]=tmp;}
 				}
 			for(i=0;i<nr_fold;i++)
 			{
@@ -2234,7 +2242,7 @@ public class svm {
 			for(i=0;i<l;i++)
 			{
 				int j = i+rand.nextInt(l-i);
-				do {int tmp=perm[i]; perm[i]=perm[j]; perm[j]=tmp;} while(false);
+				{int tmp=perm[i]; perm[i]=perm[j]; perm[j]=tmp;}
 			}
 			for(i=0;i<=nr_fold;i++)
 				fold_start[i]=i*l/nr_fold;
