@@ -2019,7 +2019,6 @@ public class svm {
     /**
      * Train an SVM.
      * <pre>
-     * (@code
      * Before you classify test data, you need to construct an SVM model
      * (`svm_model') using training data. A model can also be saved in
      * a file for later use. Once an SVM model is available, you can use it
@@ -2054,7 +2053,6 @@ public class svm {
      *
      * where {index,value} is stored in the class `svm_node':
      *
-     * }
      * </pre>
      *
      * @param prob The problem
