@@ -35,23 +35,46 @@ package tw.edu.ntu.csie.libsvm;
 
 import java.util.StringJoiner;
 
-public class svm_problem implements java.io.Serializable
-{
-	public int l;
-	public double[] y;
-	public svm_node[][] x;
+/**
+ * Encapsulation of an SVM problem.
+ *
+ * @author Chih-Chung Chang and Chih-Jen Lin
+ * @author Paul Wolfgang -- added comments
+ */
+public class svm_problem implements java.io.Serializable {
 
-        @Override
-        public String toString() {
-            StringBuilder stb = new StringBuilder();
-            for (int i = 0; i < l; i++) {
-                StringJoiner sj = new StringJoiner(" ");
-                stb.append(y[i]).append(" ");
-                for (int j = 0; j < x[i].length; j++) {
-                    sj.add(x[i][j].toString());
-                }
-                stb.append(sj).append("\n");
+    /**
+     * The number of training data items.
+     */
+    public int l;
+
+    /**
+     * The target value for each item.
+     */
+    public double[] y;
+
+    /**
+     * The sparse representation of the training vector.
+     */
+    public svm_node[][] x;
+
+    /**
+     * Create a string representation of the problem.
+     * The representation consists a line for each training item with the
+     * y value first followed by each of the svm nodes.
+     * @return String representation of the problem.
+     */
+    @Override
+    public String toString() {
+        StringBuilder stb = new StringBuilder();
+        for (int i = 0; i < l; i++) {
+            StringJoiner sj = new StringJoiner(" ");
+            stb.append(y[i]).append(" ");
+            for (int j = 0; j < x[i].length; j++) {
+                sj.add(x[i][j].toString());
             }
-            return stb.toString();
+            stb.append(sj).append("\n");
         }
+        return stb.toString();
+    }
 }

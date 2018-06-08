@@ -32,13 +32,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package tw.edu.ntu.csie.libsvm;
+
+/**
+ * Encapsulation of an SVM node
+ * @author Chih-Chung Chang and Chih-Jen Lin
+ * @author Paul Wolfgang -- added comments
+ */
 public class svm_node implements java.io.Serializable
 {
-	public int index;
-	public double value;
+	
+    /** The attribute index */
+    public int index;
+    
+    /** The attribute value */
+    public double value;
 
-        @Override
-        public String toString() {
+    /**
+     * Create a string representation of the node.
+     * Output is the attribute index followed by the attribute value separated
+     * by a colon.
+     * @return &lt;index&gt;:&lt;value&gt;
+     */
+    @Override
+    public String toString() {
             return String.format("%d:%f", index, value);
         }
 }

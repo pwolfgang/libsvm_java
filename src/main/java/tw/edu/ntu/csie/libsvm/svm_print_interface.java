@@ -32,7 +32,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package tw.edu.ntu.csie.libsvm;
-public interface svm_print_interface
-{
-	public void print(String s);
+
+/**
+ * Interface for customized output. Users can specify their output format by  
+ * <pre>
+ * your_print_func = new svm_print_interface() {
+ *      public void print(String s) {
+ *         // your own format
+ *      }
+ * };
+ * svm.svm_set_print_string_function(your_print_func);
+ * </pre>
+ *
+ * @author Chih-Chung Chang and Chih-Jen Lin
+ * @author Paul Wolfgang -- added comments
+ *
+ *
+ */
+public interface svm_print_interface {
+
+    public void print(String s);
 }
